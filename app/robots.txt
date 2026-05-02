@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /dashboard
-Disallow: /admin
-Sitemap: https://arendasv74.ru/sitemap.xml
-Host: https://arendasv74.ru
