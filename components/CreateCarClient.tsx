@@ -17,7 +17,7 @@ const carSchema = z.object({
   description: z.string().min(10, 'Опишите автомобиль (минимум 10 символов)'),
   cities: z.array(
     z.object({
-      id: z.coerce.number({ invalid_type_error: 'Выберите город' }).min(1, 'Выберите город'),
+      id: z.coerce.number().min(1, 'Выберите город'),
       price_per_day: z.coerce.number().positive('Цена должна быть положительной'),
       buyout_price: z.coerce.number().positive().optional(),
       description: z.string().optional(),
@@ -48,7 +48,6 @@ export default function CreateCarClient() {
     }
   }, [user, isLoading, router]);
 
-  // Загрузка всех городов из API
   useEffect(() => {
     api.get('/cities').then((res) => setAllCities(res.data)).catch(console.error);
   }, []);
@@ -59,7 +58,7 @@ export default function CreateCarClient() {
     control,
     formState: { errors },
   } = useForm<CarForm>({
-    resolver: zodResolver(carSchema),
+    resolver: zodResolver(carSchema) as any, // временное решение конфликта типов
     defaultValues: {
       cities: [{ id: 0, price_per_day: 0, buyout_price: undefined, description: '' }],
     },
@@ -91,9 +90,7 @@ export default function CreateCarClient() {
       formData.append('model', data.model);
       formData.append('year', data.year.toString());
       formData.append('description', data.description);
-      // Города передаём как JSON строку
       formData.append('cities', JSON.stringify(data.cities));
-      // Фото
       if (fileInputRef.current?.files) {
         for (let i = 0; i < fileInputRef.current.files.length; i++) {
           formData.append('photos[]', fileInputRef.current.files[i]);
@@ -165,10 +162,7 @@ export default function CreateCarClient() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm mb-1">Город</label>
-                  <select
-                    {...register(`cities.${index}.id` as const)}
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  >
+                  <select {...register(`cities.${index}.id` as const)} className="w-full border rounded px-2 py-1 text-sm">
                     <option value="">Выберите город</option>
                     {allCities.map((city) => (
                       <option key={city.id} value={city.id}>{city.name}</option>
@@ -177,29 +171,15 @@ export default function CreateCarClient() {
                 </div>
                 <div>
                   <label className="block text-sm mb-1">Цена/день</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register(`cities.${index}.price_per_day` as const)}
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
+                  <input type="number" step="0.01" {...register(`cities.${index}.price_per_day` as const)} className="w-full border rounded px-2 py-1 text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm mb-1">Выкуп</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register(`cities.${index}.buyout_price` as const)}
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
+                  <input type="number" step="0.01" {...register(`cities.${index}.buyout_price` as const)} className="w-full border rounded px-2 py-1 text-sm" />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm mb-1">Описание для города</label>
-                  <textarea
-                    rows={2}
-                    {...register(`cities.${index}.description` as const)}
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
+                  <textarea rows={2} {...register(`cities.${index}.description` as const)} className="w-full border rounded px-2 py-1 text-sm" />
                 </div>
               </div>
             </div>
@@ -249,11 +229,7 @@ export default function CreateCarClient() {
           {errors.photos && <p className="text-red-500 text-sm mt-1">Пожалуйста, выберите фотографии</p>}
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-        >
+        <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50">
           {isSubmitting ? 'Создание...' : 'Опубликовать объявление'}
         </button>
       </form>
