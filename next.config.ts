@@ -1,22 +1,15 @@
 // next.config.ts
-import type { NextConfig } from 'next';
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'ui-avatars.com',
-        pathname: '/api/**',
-      },
-      {
-        protocol: 'http',
-        hostname: '127.0.0.1',
-        port: '8000',
-        pathname: '/storage/**',
-      },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'http', hostname: '127.0.0.1', port: '8000', pathname: '/storage/**' },
     ],
-    unoptimized: process.env.NODE_ENV === 'development',
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
   },
 };
 

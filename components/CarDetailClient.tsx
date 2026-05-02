@@ -16,14 +16,12 @@ import {
   Calendar,
   ShieldCheck,
   Banknote,
-  CheckCircle2,
   Share2,
   Heart,
   AlertTriangle,
   Edit3,
   Trash2,
   ImagePlus,
-  X,
 } from 'lucide-react';
 
 interface CarDetailClientProps {
@@ -85,7 +83,11 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" /></div>;
+  if (loading) return (
+    <div className="flex justify-center py-12">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+    </div>
+  );
   if (!car) return <div className="text-center py-12 text-gray-500">Автомобиль не найден</div>;
 
   const photos = car.photos || [];
@@ -181,7 +183,13 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
                       idx === currentPhotoIndex ? 'border-blue-600 shadow-md' : 'border-gray-200 hover:border-gray-400'
                     }`}
                   >
-                    <Image src={thumbUrl} alt={`Миниатюра ${idx + 1}`} fill className="object-cover" unoptimized />
+                    <Image
+                      src={thumbUrl}
+                      alt={`Миниатюра ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
                   </button>
                 );
               })}
@@ -296,21 +304,41 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
           </div>
 
           {/* Владелец */}
-          <div className="flex items-center gap-3">
-  <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-100">
-    {car.user?.avatar_url ? (
-      <Image src={car.user.avatar_url} alt={car.user.name} width={40} height={40} className="object-cover" />
-    ) : (
-      <div className="w-full h-full flex items-center justify-center text-blue-600 font-bold">
-        {car.user?.name?.charAt(0) || '?'}
-      </div>
-    )}
-  </div>
-  <div>
-    <p className="font-medium">{car.user?.name || 'Пользователь'}</p>
-    {car.user?.phone && <p className="text-sm text-gray-500">{car.user.phone}</p>}
-  </div>
-</div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border">
+            <h3 className="font-semibold text-lg mb-3">Владелец</h3>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-100">
+                {car.user?.avatar_url ? (
+                  <Image src={car.user.avatar_url} alt={car.user?.name || 'Пользователь'} width={40} height={40} className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-blue-600 font-bold">
+                    {car.user?.name?.charAt(0) || '?'}
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="font-medium">{car.user?.name || 'Пользователь'}</p>
+                {car.user?.phone && <p className="text-sm text-gray-500">{car.user.phone}</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* ДОСТУПЕН В ГОРОДАХ (новый блок) */}
+          {car.cities && car.cities.length > 0 && (
+            <div className="bg-white p-6 rounded-2xl shadow-sm border">
+              <h3 className="font-semibold text-lg mb-4">Доступен в городах</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {car.cities.map((city: any) => (
+                  <div key={city.id} className="flex justify-between items-center">
+                    <span className="text-sm text-gray-700">{city.name}</span>
+                    <span className="text-sm font-medium">
+                      {city.pivot?.price_per_day ?? car.price_per_day} ₽/день
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Действия для владельца */}
           {isOwner && (
