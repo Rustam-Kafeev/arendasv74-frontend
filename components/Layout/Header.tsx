@@ -54,7 +54,7 @@ export default function Header() {
                       width={32}
                       height={32}
                       className="object-cover"
-                      unoptimized={user.avatar_url.startsWith('http://127.0.0.1')}
+                      unoptimized={user.avatar_url?.startsWith('http')}
                     />
                   ) : (
                     <Image
