@@ -10,6 +10,17 @@ export interface User {
   created_at: string;
   updated_at: string;
 }
+export interface City {
+  id: number;
+  name: string;
+  pivot?: {
+    price_per_day: string;
+    buyout_price: string | null;
+    description: string | null;
+    is_available: boolean;
+     cities?: City[];  // <-- добавить
+  };
+}
 
 export interface Car {
   id: number;
