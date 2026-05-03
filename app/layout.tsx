@@ -19,14 +19,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <head>
-          <link
-          rel="preload"
-          href="https://fonts.bunny.net/css?family=inter:400,500,600,700"
-          as="style"
-        />
-        <meta name="color-scheme" content="light only" />
-      </head>
       <body className={`${inter.className} bg-white text-gray-900`}>
         <AuthProvider>
           <div className="flex flex-col min-h-screen">
