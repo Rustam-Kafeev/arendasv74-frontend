@@ -24,6 +24,17 @@ export interface City {
   };
 }
 
+export interface CarCity {
+  id: number;
+  name: string;
+  pivot?: {
+    price_per_day: string;
+    buyout_price: string | null;
+    description: string | null;
+    is_available: boolean;
+  };
+}
+
 export interface Car {
   id: number;
   user_id: number;
@@ -31,18 +42,16 @@ export interface Car {
   model: string;
   year: number;
   description: string;
-  city: string; // оставлено для обратной совместимости, в будущем можно убрать
-  price_per_day: string; // аналогично
-  buyout_price: string | null;
   photos: string[];
   is_available: boolean;
   created_at: string;
   updated_at: string;
   user?: Pick<User, 'id' | 'name' | 'phone' | 'avatar_url'>;
+  cities?: CarCity[];
   views_today?: number;
   views_count?: number;
-  cities?: City[]; // новый массив городов с индивидуальными ценами
-  defaultPrice?: string; // цена по умолчанию, если не выбран конкретный город
+  price_per_day?: string;   // оставлено для обратной совместимости (если вдруг приходит)
+  buyout_price?: string | null;
 }
 
 export interface AuthResponse {

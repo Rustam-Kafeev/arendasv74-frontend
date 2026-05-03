@@ -1,10 +1,9 @@
-// next.config.ts
-
 const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'ui-avatars.com' },
       { protocol: 'http', hostname: '127.0.0.1', port: '8000', pathname: '/storage/**' },
     ],
   },
