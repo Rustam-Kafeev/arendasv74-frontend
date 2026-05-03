@@ -247,25 +247,12 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
   <h3 className="font-semibold text-lg mb-3">Владелец</h3>
   <div className="flex items-center gap-3">
     <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-100">
-      {car.user?.avatar_url ? (
-        <Image
-          src={car.user.avatar_url}
-          alt={car.user?.name || 'Пользователь'}
-          width={40}
-          height={40}
-          className="object-cover"
-          unoptimized
-        />
-      ) : (
-        <Image
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(car.user?.name || '?')}&background=random&size=128`}
-          alt={car.user?.name || 'Пользователь'}
-          width={40}
-          height={40}
-          className="object-cover"
-          unoptimized
-        />
-      )}
+     {car.user?.avatar_url ? (
+  <Image src={car.user.avatar_url} alt={car.user?.name || 'Пользователь'} width={40} height={40} className="object-cover" unoptimized />
+) : (
+  <Image src={`https://ui-avatars.com/api/?name=${encodeURIComponent(car.user?.name || '?')}&background=random&size=128`}
+    alt={car.user?.name || 'Пользователь'} width={40} height={40} className="object-cover" unoptimized />
+)}
     </div>
     <div>
       <p className="font-medium">{car.user?.name || 'Пользователь'}</p>
