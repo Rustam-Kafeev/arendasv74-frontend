@@ -93,19 +93,19 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Хлебные крошки */}
-      <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-        <button onClick={() => router.push('/')} className="hover:text-blue-600">Главная</button>
-        <span>/</span>
-        {car.cities && car.cities.length > 0 && (
-          <button onClick={() => router.push(`/cities/${car.cities![0]!.name}`)} className="hover:text-blue-600">
-            {car.cities[0].name}
-          </button>
-        )}
-        <span>/</span>
-        <span className="text-gray-900 font-medium truncate">
-          {car.brand} {car.model} {car.year}
-        </span>
-      </nav>
+     <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+  <button onClick={() => router.push('/')} className="hover:text-blue-600">Главная</button>
+  <span>/</span>
+  {car.cities && car.cities.length > 0 && (
+    <button onClick={() => router.push(`/cities/${car.cities![0].name}`)} className="hover:text-blue-600">
+      {car.cities[0].name}
+    </button>
+  )}
+  <span>/</span>
+  <span className="text-gray-900 font-medium truncate">
+    {car.brand} {car.model} {car.year}
+  </span>
+</nav>
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Левая колонка – Галерея (без изменений, код сокращён для примера) */}
