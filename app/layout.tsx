@@ -22,20 +22,18 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${inter.className} bg-white text-gray-900`}>
-       <AuthProvider>
-  <ChatProvider>
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">{children}</main>
-      <Footer />
-    </div>
-    <ChatPopup
-      carId={chatCarId}
-      carName={chatCarName}
-      onClose={closeChat}
-    />
-  </ChatProvider>
-</AuthProvider>
+        <AuthProvider>
+          <ChatProvider>
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className="flex-grow container mx-auto px-4 py-8">
+                {children}
+              </main>
+              <Footer />
+            </div>
+            <ChatPopup />
+          </ChatProvider>
+        </AuthProvider>
       </body>
     </html>
   );
