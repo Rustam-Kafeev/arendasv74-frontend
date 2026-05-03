@@ -3,38 +3,32 @@
 import { useEffect, useState, useRef } from 'react';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useChat } from '@/components/ChatContext';
 import { X, Send, MessageCircle } from 'lucide-react';
-
-interface ChatPopupProps {
-  carId: number | null;
-  carName?: string;
-  onClose: () => void;
-}
 
 const quickReplies = [
   'Здравствуйте! Подскажите, пожалуйста, условия.',
   'Какая цена при выкупе?',
 ];
 
-export default function ChatPopup({ carId, carName, onClose }: ChatPopupProps) {
+export default function ChatPopup() {
+  const { chatCarId, chatCarName, closeChat, isChatOpen } = useChat();
   const { user } = useAuth();
   const [messages, setMessages] = useState<any[]>([]);
   const [newMsg, setNewMsg] = useState('');
   const [conversationId, setConversationId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (!carId || !user) return;
+    if (!chatCarId || !user) return;
 
-    api.get(`/cars/${carId}/conversation`)
+    api.get(`/cars/${chatCarId}/conversation`)
       .then(res => {
         setConversationId(res.data.id);
         setMessages(res.data.messages || []);
-        setIsOpen(true);
       })
       .catch(console.error);
-  }, [carId, user]);
+  }, [chatCarId, user]);
 
   useEffect(() => {
     if (!conversationId) return;
@@ -51,7 +45,7 @@ export default function ChatPopup({ carId, carName, onClose }: ChatPopupProps) {
     setNewMsg('');
   };
 
-  if (!carId || !isOpen) return null;
+  if (!isChatOpen) return null;
 
   return (
     <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border flex flex-col z-50">
@@ -59,9 +53,9 @@ export default function ChatPopup({ carId, carName, onClose }: ChatPopupProps) {
       <div className="flex items-center justify-between p-3 border-b bg-gray-50 rounded-t-2xl">
         <div className="flex items-center gap-2">
           <MessageCircle className="w-5 h-5 text-blue-600" />
-          <span className="font-medium text-sm">{carName || 'Чат'}</span>
+          <span className="font-medium text-sm">{chatCarName || 'Чат'}</span>
         </div>
-        <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded-full">
+        <button onClick={closeChat} className="p-1 hover:bg-gray-200 rounded-full">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -81,7 +75,7 @@ export default function ChatPopup({ carId, carName, onClose }: ChatPopupProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Поле ввода и кнопка отправки */}
+      {/* Поле ввода */}
       <div className="border-t p-2 flex gap-2">
         <input
           value={newMsg}
