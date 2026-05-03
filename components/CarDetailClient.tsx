@@ -1,4 +1,5 @@
 'use client';
+import { useChat } from '@/components/ChatContext';
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
@@ -15,7 +16,7 @@ import {
 interface CarDetailClientProps {
   carId: string;
 }
-
+const { openChat } = useChat();
 export default function CarDetailClient({ carId }: CarDetailClientProps) {
   const { user } = useAuth();
   const router = useRouter();
@@ -41,15 +42,13 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
     }
   }, [carId]);
 
-  const handleContact = async () => {
-    if (!user) { router.push('/auth/login'); return; }
-    try {
-      const res = await api.get(`/cars/${car?.id}/conversation`);
-      router.push(`/dashboard/messages/${res.data.id}`);
-    } catch (error) {
-      console.error('Ошибка создания беседы:', error);
-    }
-  };
+ const handleContact = () => {
+  if (!user) {
+    router.push('/auth/login');
+    return;
+  }
+  openChat(car?.id!, `${car?.brand} ${car?.model}`);
+};
 
   const handleDelete = async () => {
     if (!confirm('Вы уверены, что хотите удалить это объявление?')) return;
