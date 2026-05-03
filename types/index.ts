@@ -47,10 +47,11 @@ export interface Car {
   created_at: string;
   updated_at: string;
   user?: Pick<User, 'id' | 'name' | 'phone' | 'avatar_url'>;
+  city?: string;               // для обратной совместимости
   cities?: CarCity[];
   views_today?: number;
   views_count?: number;
-  price_per_day?: string;   // оставлено для обратной совместимости (если вдруг приходит)
+  price_per_day?: string;
   buyout_price?: string | null;
 }
 

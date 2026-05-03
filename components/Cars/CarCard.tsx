@@ -16,6 +16,13 @@ export default function CarCard({ car }: CarCardProps) {
       : `http://127.0.0.1:8000${car.photos[0]}`
     : '/placeholder-car.jpg';
 
+  // Определяем город для отображения
+  const displayCity = car.city || (car.cities && car.cities.length > 0 ? car.cities[0].name : '—');
+  // Определяем цену
+  const displayPrice = car.price_per_day || (car.cities && car.cities.length > 0 ? car.cities[0].pivot?.price_per_day : null);
+  // Определяем выкуп
+  const displayBuyout = car.buyout_price || (car.cities && car.cities.length > 0 ? car.cities[0].pivot?.buyout_price : null);
+
   return (
     <Link
       href={`/cars/${car.id}`}
@@ -30,9 +37,11 @@ export default function CarCard({ car }: CarCardProps) {
           unoptimized={photoUrl.startsWith('http')}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold shadow-sm">
-          {car.price_per_day} ₽ / день
-        </div>
+        {displayPrice && (
+          <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold shadow-sm">
+            {displayPrice} ₽ / день
+          </div>
+        )}
       </div>
 
       <div className="p-5">
@@ -46,16 +55,16 @@ export default function CarCard({ car }: CarCardProps) {
           </span>
           <span className="flex items-center gap-1">
             <MapPin className="w-4 h-4" />
-            {car.city}
+            {displayCity}
           </span>
         </div>
         <div className="mt-2 flex items-center gap-1 text-sm text-gray-500">
           <Eye className="w-4 h-4" />
           <span>{car.views_today || 0} сегодня</span>
         </div>
-        {car.buyout_price && (
+        {displayBuyout && (
           <div className="mt-3 text-sm font-medium text-green-700 bg-green-50 px-3 py-1.5 rounded-lg w-fit">
-            Выкуп: {car.buyout_price} ₽
+            Выкуп: {displayBuyout} ₽
           </div>
         )}
       </div>
