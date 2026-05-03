@@ -6,8 +6,8 @@ import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Car, Plus, MessageSquare, Eye,
-  BarChart3, Zap, AlertCircle
+  Car, Plus, Eye,
+  BarChart3, Zap, AlertCircle, MessageSquare
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -71,9 +71,6 @@ export default function DashboardClient() {
   if (stats && stats.today_views === 0 && stats.cars_count > 0) {
     tips.push('Ваши объявления не просматривали сегодня. Попробуйте обновить фото или снизить цену.');
   }
-  if (stats && stats.unread_messages > 0) {
-    tips.push(`У вас ${stats.unread_messages} непрочитанных сообщений. Ответьте скорее, чтобы не потерять клиентов.`);
-  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -97,8 +94,8 @@ export default function DashboardClient() {
         </Link>
       </div>
 
-      {/* Карточки статистики (три штуки, без дублей) */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      {/* Карточки статистики (две штуки) */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
         <Link
           href="/dashboard/cars"
           className="bg-white rounded-2xl shadow-sm border p-5 hover:shadow-md transition group"
@@ -125,24 +122,6 @@ export default function DashboardClient() {
           <p className="text-3xl font-bold mt-3">{stats?.today_views || 0}</p>
           <p className="text-xs text-gray-400 mt-1">за текущий день</p>
         </div>
-        <Link
-          href="/dashboard/messages"
-          className="bg-white rounded-2xl shadow-sm border p-5 hover:shadow-md transition group"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500">Сообщения</span>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-white" />
-            </div>
-          </div>
-          <p className="text-3xl font-bold mt-3">{stats?.unread_messages || 0}</p>
-          <p className="text-xs text-gray-400 mt-1">непрочитанных</p>
-          {stats?.unread_messages ? (
-            <span className="inline-block bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full mt-2">
-              {stats.unread_messages} новых
-            </span>
-          ) : null}
-        </Link>
       </div>
 
       {/* График просмотров (если есть данные) */}
@@ -175,13 +154,19 @@ export default function DashboardClient() {
         </div>
       )}
 
-      {/* Последние сообщения и советы */}
+      {/* Сообщения и советы */}
       <div className="grid lg:grid-cols-2 gap-6">
+        {/* Единый блок сообщений */}
         <div className="bg-white rounded-2xl shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-green-600" />
-              Последние сообщения
+              Сообщения
+              {stats?.unread_messages ? (
+                <span className="inline-block bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full ml-2">
+                  {stats.unread_messages} новых
+                </span>
+              ) : null}
             </h2>
             <Link href="/dashboard/messages" className="text-sm text-blue-600 hover:underline">Все →</Link>
           </div>
@@ -207,6 +192,7 @@ export default function DashboardClient() {
             <p className="text-sm text-gray-500">Нет новых сообщений</p>
           )}
         </div>
+        {/* Советы */}
         <div className="bg-white rounded-2xl shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
