@@ -174,7 +174,7 @@ export default function CreateCarClient() {
                   <input type="number" step="0.01" {...register(`cities.${index}.price_per_day` as const)} className="w-full border rounded px-2 py-1 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm mb-1">Выкуп</label>
+                  <label className="block text-sm mb-1">Аванс</label>
                   <input type="number" step="0.01" {...register(`cities.${index}.buyout_price` as const)} className="w-full border rounded px-2 py-1 text-sm" />
                 </div>
                 <div className="col-span-2">

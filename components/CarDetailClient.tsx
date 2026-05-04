@@ -188,7 +188,7 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
             {cityBuyoutPrice && (
               <div className="mt-3 flex items-center text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg">
                 <Banknote className="w-4 h-4 mr-2" />
-                <span className="font-medium">Выкуп: {cityBuyoutPrice} ₽</span>
+                <span className="font-medium">Аванс: {cityBuyoutPrice} ₽</span>
               </div>
             )}
             <div className="mt-4 space-y-3">
