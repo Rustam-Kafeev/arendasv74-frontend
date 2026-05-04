@@ -6,9 +6,11 @@ import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { User, Settings, LogOut } from 'lucide-react';
+import { useChat } from '@/components/ChatContext';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { openChat } = useChat();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -41,7 +43,9 @@ export default function Header() {
           {user ? (
             <>
               <Link href="/cars/create" className="hover:text-blue-600">Добавить объявление</Link>
-              <Link href="/dashboard/messages" className="hover:text-blue-600">Сообщения</Link>
+              <button onClick={() => openChat(0)} className="hover:text-blue-600 text-gray-700">
+  Сообщения
+</button>
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
