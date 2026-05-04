@@ -19,7 +19,7 @@ const carSchema = z.object({
     z.object({
       id: z.coerce.number().min(1, 'Выберите город'),
       price_per_day: z.coerce.number().positive('Цена должна быть положительной'),
-      buyout_price: z.coerce.number().positive().optional(),
+      advance: z.coerce.number().positive().optional(),
       description: z.string().optional(),
     })
   ).min(1, 'Выберите хотя бы один город'),
@@ -78,9 +78,9 @@ export default function EditCarClient() {
       const citiesForForm = data.cities?.map((c: any) => ({
         id: c.id,
         price_per_day: c.pivot?.price_per_day || 0,
-        buyout_price: c.pivot?.buyout_price,
+        advance: c.pivot?.advance,
         description: c.pivot?.description || '',
-      })) || [{ id: 0, price_per_day: 0, buyout_price: undefined, description: '' }];
+      })) || [{ id: 0, price_per_day: 0, advance: undefined, description: '' }];
 
       reset({
         brand: data.brand,
@@ -115,7 +115,7 @@ export default function EditCarClient() {
   };
 
   const addCity = () => {
-    append({ id: 0, price_per_day: 0, buyout_price: undefined, description: '' });
+    append({ id: 0, price_per_day: 0, advance: undefined, description: '' });
   };
 
   const onSubmit = async (data: CarForm) => {
@@ -209,7 +209,7 @@ export default function EditCarClient() {
                 </div>
                 <div>
                   <label className="block text-sm mb-1">Аванс</label>
-                  <input type="number" step="0.01" {...register(`cities.${index}.buyout_price` as const)} className="w-full border rounded px-2 py-1 text-sm" />
+                  <input type="number" step="0.01" {...register(`cities.${index}.advance` as const)} className="w-full border rounded px-2 py-1 text-sm" />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm mb-1">Описание для города</label>

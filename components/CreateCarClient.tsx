@@ -19,7 +19,7 @@ const carSchema = z.object({
     z.object({
       id: z.coerce.number().min(1, 'Выберите город'),
       price_per_day: z.coerce.number().positive('Цена должна быть положительной'),
-      buyout_price: z.coerce.number().positive().optional(),
+      advance: z.coerce.number().positive().optional(), // ← замена buyout_price на advance
       description: z.string().optional(),
     })
   ).min(1, 'Выберите хотя бы один город'),
@@ -58,9 +58,9 @@ export default function CreateCarClient() {
     control,
     formState: { errors },
   } = useForm<CarForm>({
-    resolver: zodResolver(carSchema) as any, // временное решение конфликта типов
+    resolver: zodResolver(carSchema) as any,
     defaultValues: {
-      cities: [{ id: 0, price_per_day: 0, buyout_price: undefined, description: '' }],
+      cities: [{ id: 0, price_per_day: 0, advance: undefined, description: '' }],
     },
   });
 
@@ -78,7 +78,7 @@ export default function CreateCarClient() {
   };
 
   const addCity = () => {
-    append({ id: 0, price_per_day: 0, buyout_price: undefined, description: '' });
+    append({ id: 0, price_per_day: 0, advance: undefined, description: '' });
   };
 
   const onSubmit = async (data: CarForm) => {
@@ -175,7 +175,7 @@ export default function CreateCarClient() {
                 </div>
                 <div>
                   <label className="block text-sm mb-1">Аванс</label>
-                  <input type="number" step="0.01" {...register(`cities.${index}.buyout_price` as const)} className="w-full border rounded px-2 py-1 text-sm" />
+                  <input type="number" step="0.01" {...register(`cities.${index}.advance` as const)} className="w-full border rounded px-2 py-1 text-sm" />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm mb-1">Описание для города</label>
