@@ -32,6 +32,7 @@ export interface CarCity {
     buyout_price: string | null;
     description: string | null;
     is_available: boolean;
+     advance?: string | null;   // ← добавлено
   };
 }
 

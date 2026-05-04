@@ -1,5 +1,4 @@
 'use client';
-import { useChat } from '@/components/ChatContext';
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
@@ -7,6 +6,7 @@ import { Car, CarCity } from '@/types';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { useChat } from '@/components/ChatContext';
 import {
   ChevronLeft, ChevronRight, Phone, MessageCircle, Eye, MapPin,
   Calendar, ShieldCheck, Banknote, Share2, Heart, AlertTriangle,
@@ -16,10 +16,11 @@ import {
 interface CarDetailClientProps {
   carId: string;
 }
-const { openChat } = useChat();
+
 export default function CarDetailClient({ carId }: CarDetailClientProps) {
   const { user } = useAuth();
   const router = useRouter();
+  const { openChat } = useChat();
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
@@ -42,13 +43,13 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
     }
   }, [carId]);
 
- const handleContact = () => {
-  if (!user) {
-    router.push('/auth/login');
-    return;
-  }
-  openChat(car?.id!, `${car?.brand} ${car?.model}`);
-};
+  const handleContact = () => {
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
+    openChat(car?.id!, `${car?.brand} ${car?.model}`);
+  };
 
   const handleDelete = async () => {
     if (!confirm('Вы уверены, что хотите удалить это объявление?')) return;
@@ -87,27 +88,27 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
   const currentCity: CarCity | undefined = car.cities?.find(c => c.id === selectedCityId);
   const cityDescription = currentCity?.pivot?.description || car.description || '';
   const cityPricePerDay = currentCity?.pivot?.price_per_day ?? car.price_per_day;
-  const cityBuyoutPrice = currentCity?.pivot?.buyout_price ?? car.buyout_price;
+  const cityBuyoutPrice = currentCity?.pivot?.advance ?? car.buyout_price;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Хлебные крошки */}
-     <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-  <button onClick={() => router.push('/')} className="hover:text-blue-600">Главная</button>
-  <span>/</span>
-  {car.cities && car.cities.length > 0 && (
-    <button onClick={() => router.push(`/cities/${car.cities![0].name}`)} className="hover:text-blue-600">
-      {car.cities[0].name}
-    </button>
-  )}
-  <span>/</span>
-  <span className="text-gray-900 font-medium truncate">
-    {car.brand} {car.model} {car.year}
-  </span>
-</nav>
+      <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+        <button onClick={() => router.push('/')} className="hover:text-blue-600">Главная</button>
+        <span>/</span>
+        {car.cities && car.cities.length > 0 && (
+          <button onClick={() => router.push(`/cities/${car.cities![0].name}`)} className="hover:text-blue-600">
+            {car.cities[0].name}
+          </button>
+        )}
+        <span>/</span>
+        <span className="text-gray-900 font-medium truncate">
+          {car.brand} {car.model} {car.year}
+        </span>
+      </nav>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Левая колонка – Галерея (без изменений, код сокращён для примера) */}
+        {/* Левая колонка – Галерея */}
         <div className="lg:col-span-2">
           <div className="relative group overflow-hidden rounded-2xl bg-gray-100 shadow-sm">
             {photos.length > 0 ? (
@@ -242,23 +243,23 @@ export default function CarDetailClient({ carId }: CarDetailClientProps) {
           )}
 
           {/* Владелец */}
-<div className="bg-white p-6 rounded-2xl shadow-sm border">
-  <h3 className="font-semibold text-lg mb-3">Владелец</h3>
-  <div className="flex items-center gap-3">
-    <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-100">
-     {car.user?.avatar_url ? (
-  <Image src={car.user.avatar_url} alt={car.user?.name || 'Пользователь'} width={40} height={40} className="object-cover" unoptimized />
-) : (
-  <Image src={`https://ui-avatars.com/api/?name=${encodeURIComponent(car.user?.name || '?')}&background=random&size=128`}
-    alt={car.user?.name || 'Пользователь'} width={40} height={40} className="object-cover" unoptimized />
-)}
-    </div>
-    <div>
-      <p className="font-medium">{car.user?.name || 'Пользователь'}</p>
-      {car.user?.phone && <p className="text-sm text-gray-500">{car.user.phone}</p>}
-    </div>
-  </div>
-</div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border">
+            <h3 className="font-semibold text-lg mb-3">Владелец</h3>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-100">
+                {car.user?.avatar_url ? (
+                  <Image src={car.user.avatar_url} alt={car.user?.name || 'Пользователь'} width={40} height={40} className="object-cover" unoptimized />
+                ) : (
+                  <Image src={`https://ui-avatars.com/api/?name=${encodeURIComponent(car.user?.name || '?')}&background=random&size=128`}
+                    alt={car.user?.name || 'Пользователь'} width={40} height={40} className="object-cover" unoptimized />
+                )}
+              </div>
+              <div>
+                <p className="font-medium">{car.user?.name || 'Пользователь'}</p>
+                {car.user?.phone && <p className="text-sm text-gray-500">{car.user.phone}</p>}
+              </div>
+            </div>
+          </div>
 
           {/* Действия владельца */}
           {isOwner && (
