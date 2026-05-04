@@ -19,7 +19,7 @@ const carSchema = z.object({
     z.object({
       id: z.coerce.number().min(1, 'Выберите город'),
       price_per_day: z.coerce.number().positive('Цена должна быть положительной'),
-      advance: z.coerce.number().positive().optional(), // ← замена buyout_price на advance
+      advance: z.coerce.number().positive().optional(),
       description: z.string().optional(),
     })
   ).min(1, 'Выберите хотя бы один город'),
@@ -119,7 +119,6 @@ export default function CreateCarClient() {
         </div>
       )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Основные поля */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-1">Марка</label>
