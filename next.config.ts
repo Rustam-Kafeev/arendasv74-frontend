@@ -10,6 +10,8 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+   // Разрешаем доступ с этого IP в режиме разработки
+  allowedDevOrigins: ['192.168.0.105'],
 };
 
 export default nextConfig;

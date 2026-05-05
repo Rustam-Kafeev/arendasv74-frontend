@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Имя должно быть не менее 2 символов'),
@@ -26,6 +27,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const {
     register,
@@ -87,20 +90,38 @@ export default function RegisterPage() {
         </div>
         <div>
           <label className="block mb-1">Пароль</label>
-          <input
-            type="password"
-            {...register('password')}
-            className="w-full border rounded px-3 py-2"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              {...register('password')}
+              className="w-full border rounded px-3 py-2 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
           {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
         </div>
         <div>
           <label className="block mb-1">Подтверждение пароля</label>
-          <input
-            type="password"
-            {...register('password_confirmation')}
-            className="w-full border rounded px-3 py-2"
-          />
+          <div className="relative">
+            <input
+              type={showConfirm ? 'text' : 'password'}
+              {...register('password_confirmation')}
+              className="w-full border rounded px-3 py-2 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirm(!showConfirm)}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+            >
+              {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
           {errors.password_confirmation && (
             <p className="text-red-500 text-sm mt-1">{errors.password_confirmation.message}</p>
           )}

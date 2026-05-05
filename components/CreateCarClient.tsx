@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,7 +8,7 @@ import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import Image from 'next/image';
-import { Trash2 } from 'lucide-react';
+import { Trash2, GripVertical } from 'lucide-react';
 
 const carSchema = z.object({
   brand: z.string().min(1, 'Укажите марку'),
@@ -18,7 +18,8 @@ const carSchema = z.object({
   cities: z.array(
     z.object({
       id: z.coerce.number().min(1, 'Выберите город'),
-      price_per_day: z.coerce.number().positive('Цена должна быть положительной'),
+      price: z.coerce.number().positive('Укажите цену'),
+      price_period: z.enum(['day', 'week', 'month']),
       advance: z.coerce.number().positive().optional(),
       description: z.string().optional(),
     })
@@ -33,14 +34,23 @@ interface CityOption {
   name: string;
 }
 
+function formatPrice(value: string): string {
+  const num = value.replace(/\D/g, '');
+  if (!num) return '';
+  return Number(num).toLocaleString('ru-RU');
+}
+
 export default function CreateCarClient() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [allCities, setAllCities] = useState<CityOption[]>([]);
+  const dragItem = useRef<number | null>(null);
+  const dragOverItem = useRef<number | null>(null);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -60,7 +70,7 @@ export default function CreateCarClient() {
   } = useForm<CarForm>({
     resolver: zodResolver(carSchema) as any,
     defaultValues: {
-      cities: [{ id: 0, price_per_day: 0, advance: undefined, description: '' }],
+      cities: [{ id: 0, price: 0, price_period: 'day', advance: undefined, description: '' }],
     },
   });
 
@@ -72,40 +82,81 @@ export default function CreateCarClient() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const urls = Array.from(files).map((file) => URL.createObjectURL(file));
-      setPreviewUrls(urls);
+      const newFiles = Array.from(files);
+      setPhotoFiles(prev => [...prev, ...newFiles]);
+      const urls = newFiles.map((file) => URL.createObjectURL(file));
+      setPreviewUrls(prev => [...prev, ...urls]);
     }
+  };
+
+  const removePhoto = (index: number) => {
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    setPhotoFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDragStart = (index: number) => {
+    dragItem.current = index;
+  };
+
+  const handleDragEnter = (index: number) => {
+    dragOverItem.current = index;
+  };
+
+  const handleDragEnd = () => {
+    if (dragItem.current === null || dragOverItem.current === null) return;
+    const newPreviewUrls = [...previewUrls];
+    const newPhotoFiles = [...photoFiles];
+    const draggedItem = newPreviewUrls.splice(dragItem.current, 1)[0];
+    const draggedFile = newPhotoFiles.splice(dragItem.current, 1)[0];
+    newPreviewUrls.splice(dragOverItem.current, 0, draggedItem);
+    newPhotoFiles.splice(dragOverItem.current, 0, draggedFile);
+    setPreviewUrls(newPreviewUrls);
+    setPhotoFiles(newPhotoFiles);
+    dragItem.current = null;
+    dragOverItem.current = null;
   };
 
   const addCity = () => {
-    append({ id: 0, price_per_day: 0, advance: undefined, description: '' });
+    append({ id: 0, price: 0, price_period: 'day', advance: undefined, description: '' });
   };
 
-  const onSubmit = async (data: CarForm) => {
-    setIsSubmitting(true);
-    setError(null);
-    try {
-      const formData = new FormData();
-      formData.append('brand', data.brand);
-      formData.append('model', data.model);
-      formData.append('year', data.year.toString());
-      formData.append('description', data.description);
-      formData.append('cities', JSON.stringify(data.cities));
-      if (fileInputRef.current?.files) {
-        for (let i = 0; i < fileInputRef.current.files.length; i++) {
-          formData.append('photos[]', fileInputRef.current.files[i]);
-        }
-      }
-      await api.post('/cars', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+ const onSubmit = async (data: CarForm) => {
+  console.log('Submitting form with data:', data);
+  setIsSubmitting(true);
+  setError(null);
+  try {
+    const formData = new FormData();
+    formData.append('brand', data.brand);
+    formData.append('model', data.model);
+    formData.append('year', data.year.toString());
+    formData.append('description', data.description);
+
+    // Очищаем цены от пробелов
+    const cleanedCities = data.cities.map(city => ({
+      ...city,
+      price: Number(String(city.price).replace(/\s/g, '')),
+      advance: city.advance ? Number(String(city.advance).replace(/\s/g, '')) : undefined,
+    }));
+    formData.append('cities', JSON.stringify(cleanedCities));
+
+    // Добавляем фото
+    if (photoFiles.length > 0) {
+      photoFiles.forEach((file) => {
+        formData.append('photos[]', file);
       });
-      router.push('/dashboard/cars');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Ошибка при создании объявления');
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+
+    await api.post('/cars', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    router.push('/dashboard/cars');
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Ошибка при создании объявления');
+    console.error('Create car error:', err);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   if (isLoading) return <div className="text-center py-8">Загрузка...</div>;
   if (!user) return null;
@@ -169,12 +220,39 @@ export default function CreateCarClient() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm mb-1">Цена/день</label>
-                  <input type="number" step="0.01" {...register(`cities.${index}.price_per_day` as const)} className="w-full border rounded px-2 py-1 text-sm" />
+                  <label className="block text-sm mb-1">Цена</label>
+                  <div className="flex gap-1">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      {...register(`cities.${index}.price` as const)}
+                      className="flex-1 border rounded px-2 py-1 text-sm"
+                      placeholder="0"
+                      onChange={(e) => {
+                        const formatted = formatPrice(e.target.value);
+                        e.target.value = formatted;
+                      }}
+                    />
+                    <select {...register(`cities.${index}.price_period` as const)} className="border rounded px-1 py-1 text-sm">
+                      <option value="day">день</option>
+                      <option value="week">неделя</option>
+                      <option value="month">месяц</option>
+                    </select>
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm mb-1">Аванс</label>
-                  <input type="number" step="0.01" {...register(`cities.${index}.advance` as const)} className="w-full border rounded px-2 py-1 text-sm" />
+                  <label className="block text-sm mb-1">Аванс (опционально)</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    {...register(`cities.${index}.advance` as const)}
+                    className="w-full border rounded px-2 py-1 text-sm"
+                    placeholder="0"
+                    onChange={(e) => {
+                      const formatted = formatPrice(e.target.value);
+                      e.target.value = formatted;
+                    }}
+                  />
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm mb-1">Описание для города</label>
@@ -186,7 +264,7 @@ export default function CreateCarClient() {
           {errors.cities?.message && <p className="text-red-500 text-sm">{String(errors.cities.message)}</p>}
         </div>
 
-        {/* Загрузка фото */}
+        {/* Загрузка фото с перетаскиванием */}
         <div>
           <label className="block mb-2 font-medium">Фотографии</label>
           <input
@@ -215,8 +293,26 @@ export default function CreateCarClient() {
             ) : (
               <div className="flex flex-wrap gap-2 justify-center">
                 {previewUrls.map((url, idx) => (
-                  <div key={idx} className="relative w-[50px] h-[50px] border rounded overflow-hidden">
+                  <div
+                    key={idx}
+                    className="relative w-[50px] h-[50px] border rounded overflow-hidden group cursor-grab"
+                    draggable
+                    onDragStart={() => handleDragStart(idx)}
+                    onDragEnter={() => handleDragEnter(idx)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
                     <Image src={url} alt={`preview-${idx}`} fill className="object-cover" />
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); removePhoto(idx); }}
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-bl opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                    <div className="absolute top-0 left-0 bg-black/50 text-white p-0.5 rounded-br opacity-0 group-hover:opacity-100">
+                      <GripVertical className="w-3 h-3" />
+                    </div>
                   </div>
                 ))}
                 <button type="button" onClick={() => fileInputRef.current?.click()} className="w-[50px] h-[50px] border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100">
@@ -228,9 +324,13 @@ export default function CreateCarClient() {
           {errors.photos && <p className="text-red-500 text-sm mt-1">Пожалуйста, выберите фотографии</p>}
         </div>
 
-        <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50">
-          {isSubmitting ? 'Создание...' : 'Опубликовать объявление'}
-        </button>
+        <button
+  type="submit"
+  disabled={isSubmitting}
+  className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+>
+  {isSubmitting ? 'Создание...' : 'Опубликовать объявление'}
+</button>
       </form>
     </div>
   );
