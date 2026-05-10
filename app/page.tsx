@@ -1,4 +1,4 @@
-// app/page.tsx (серверный компонент)
+// app/page.tsx
 import type { Metadata } from 'next';
 import HomePageClient from '../components/HomePageClient';
 

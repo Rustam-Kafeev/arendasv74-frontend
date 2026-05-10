@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import EditCarClient from '@/components/EditCarClient';
+import EditCarPageClient from './EditCarPageClient';
 
 export const metadata: Metadata = {
   title: 'Редактирование объявления | Arendasv74',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function EditCarPage() {
-  return <EditCarClient />;
+  return <EditCarPageClient />;
 }

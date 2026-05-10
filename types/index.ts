@@ -9,6 +9,7 @@ export interface User {
   avatar_url?: string;
   created_at: string;
   updated_at: string;
+  
 }
 
 export interface City {
@@ -32,7 +33,8 @@ export interface CarCity {
     buyout_price: string | null;
     description: string | null;
     is_available: boolean;
-     advance?: string | null;   // ← добавлено
+    price_period?: string;     // ← добавить эту строку
+    advance?: string | null;
   };
 }
 

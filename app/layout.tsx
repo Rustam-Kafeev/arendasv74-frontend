@@ -2,10 +2,11 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth';
+import { CityProvider } from '@/contexts/CityContext';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
-import { ChatProvider } from '@/components/ChatContext';
-import ChatPopup from '@/components/ChatPopup';
+import { ChatProvider } from '@/contexts/ChatContext';
+import ChatPopup from '@/components/Chat/ChatPopup';
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
@@ -23,16 +24,18 @@ export default function RootLayout({
     <html lang="ru">
       <body className={`${inter.className} bg-white text-gray-900`}>
         <AuthProvider>
-          <ChatProvider>
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow container mx-auto px-4 py-8">
-                {children}
-              </main>
-              <Footer />
-            </div>
-            <ChatPopup />
-          </ChatProvider>
+          <CityProvider>
+            <ChatProvider>
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-grow container mx-auto px-4 py-8">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+              <ChatPopup />
+            </ChatProvider>
+          </CityProvider>
         </AuthProvider>
       </body>
     </html>
